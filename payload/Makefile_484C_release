@@ -9,8 +9,8 @@ INCLUDE		=  ../lv2/include ../lv1/include ../cryptcode/include ../debug/include
 INCLUDE		+= $(PS3DEV)/ppu/ppu/include
 LIBSDIR     =
 LIBS        =
-BUILD_TYPE  = debug
-OUTPUT		= stage2.cex
+BUILD_TYPE  = release
+OUTPUT		= stage2.bin
 
 
 CFLAGS = -ffunction-sections -fdata-sections -Os -m64 -fno-builtin -fno-exceptions \
@@ -38,7 +38,7 @@ endif
 LDFLAGS= -T stage2.ld -nostartfiles -nostdlib -nodefaultlibs -Wl,-static -L. $(foreach dir,$(LIBSDIR),-L$(dir)) $(LIBS) \
 	 -Wl,--gc-sections -Wl,-Map=stage2.map
 
-OBJS = start.o ps3mapi_core.o main.o crypto.o modulespatch.o config.o mappath.o storage_ext.o region.o cobra.o sm_ext.o  \
+OBJS = start.o ps3mapi_core.o main.o crypto.o modulespatch.o config.o mappath.o storage_ext.o region.o cobra.o sm_ext.o \
 	../lv2/src/usb.o ../lv2/src/patch.o ../lv2/src/interrupt.o ../lv2/src/interrupt_c.o ../lv2/src/io.o ../lv2/src/libc.o \
 	../lv2/src/libc_c.o ../lv2/src/memory.o ../lv2/src/memory_c.o ../lv2/src/thread.o ../lv2/src/thread_c.o ../lv2/src/process.o \
 	../lv2/src/synchronization.o ../lv2/src/modules.o ../lv2/src/modules_c.o ../lv2/src/storage.o ../lv2/src/object.o \
@@ -54,15 +54,14 @@ OBJS += laboratory.o ../debug/src/debug.o ../debug/src/printf.o ../debug/src/deb
 endif
 
 all: $(OUTPUT)
-	@cp -r $(OUTPUT) ../../BIN
+	@mv stage2.bin ../PS3HEN.BIN_484C
 	@rm -f *.o *.elf *.map *.lzma ../lv2/src/*.o ../lv1/src/*.o ../debug/src/*.o
 
 objdump: $(OUTPUT)
 	$(OBJDUMP) -D -EB -b binary -m powerpc:common64 $(OUTPUT)	
 
-%.cex: %.elf
+%.bin: %.elf
 	$(OBJCOPY) -O binary $< $@	
-	cp stage2.cex ../PS3HEN.BIN_debug
 
 stage2.elf: $(OBJS) stage2.ld
 	$(CC) $(LDFLAGS) -o $@ $(OBJS)
