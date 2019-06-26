@@ -4,6 +4,14 @@
 
 	.global _start
 
+#include <lv2/macros.h.S>
+#include <lv2/symbols.h>
+#define CALL_NORET(addr) \
+	MEM_BASE(%r0); \
+	LOAD_LABEL(%r0, %r0, addr); \
+	mtctr	%r0; \
+	bctr;		
+	
 _start:
 
 	mflr	%r0
@@ -57,7 +65,10 @@ _start:
 	ld 	%r0, 0x10(%sp)	
 	mtlr 	%r0
 	li 	%r8, 0
-	blr	
+	ld %r3, -0x1e88(%r2)
+	li %r5,0
+	li %r6,0
+	CALL_NORET(0x123fa0)
 	
 
 
