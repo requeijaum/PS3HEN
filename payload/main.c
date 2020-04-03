@@ -585,7 +585,7 @@ void ecdsa_sign(u8 *hash, u8 *R, u8 *S)
 
 #define COBRA_VERSION		0x0F
 #define COBRA_VERSION_BCD	0x0810
-#define HEN_REV				0x0300
+#define HEN_REV				0x0301
 
 #if defined(FIRMWARE_4_82)
 	#define FIRMWARE_VERSION	0x0482
@@ -597,6 +597,8 @@ void ecdsa_sign(u8 *hash, u8 *R, u8 *S)
 	#define FIRMWARE_VERSION	0x0484 
 #elif defined(FIRMWARE_4_85)
 	#define FIRMWARE_VERSION	0x0485	
+#elif defined(FIRMWARE_4_86)
+	#define FIRMWARE_VERSION	0x0486	
 #endif
 
 #if defined(CFW)
@@ -1334,6 +1336,9 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 				case PS3MAPI_OPCODE_SET_PROC_MEM:
 					return ps3mapi_set_process_mem((process_id_t)param2, param3, (char *)param4, (int)param5);
 				break;
+				case PS3MAPI_OPCODE_PROC_PAGE_ALLOCATE:
+					return ps3mapi_process_page_allocate((process_id_t)param2, param3, param4, param5, param6, (uint64_t *)param7);
+				break;
 				//----------
 				//MODULE
 				//----------
@@ -1351,6 +1356,9 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 				break;
 				case PS3MAPI_OPCODE_UNLOAD_PROC_MODULE:
 					return ps3mapi_unload_process_modules((process_id_t)param2, (sys_prx_id_t)param3);
+				break;
+				case PS3MAPI_OPCODE_GET_PROC_MODULE_INFO:
+					return ps3mapi_get_process_module_info((process_id_t)param2, (sys_prx_id_t)param3, (sys_prx_module_info_t *)param4);
 				break;
 				//----------
 				//VSH PLUGINS
@@ -1484,6 +1492,10 @@ LV2_SYSCALL2(int64_t, syscall8, (uint64_t function, uint64_t param1, uint64_t pa
 
 		case SYSCALL8_OPCODE_UNLOAD_PAYLOAD_DYNAMIC:
 			return unload_plugin_kernel(param1);
+		break;
+			
+		case SYSCALL8_OPCODE_PROC_CREATE_THREAD:
+			return ps3mapi_create_process_thread((process_id_t)param1, (thread_t *)param2, (void *)param3, (uint64_t)param4, (int)param5, (size_t)param6, (char *)param7);
 		break;
 
 		case SYSCALL8_OPCODE_MOUNT_PSX_DISCFILE:
@@ -1683,7 +1695,7 @@ static INLINE void apply_kernel_patches(void)
 	hook_function_with_precall(get_syscall_address(804),sys_fs_close,1);
 	hook_function_with_precall(get_syscall_address(802),sys_fs_read,4);
 	#endif
-	#if defined (FIRMWARE_4_82) ||  defined (FIRMWARE_4_84) ||  defined (FIRMWARE_4_85)
+	#if defined (FIRMWARE_4_82) ||  defined (FIRMWARE_4_84) ||  defined (FIRMWARE_4_85) ||  defined (FIRMWARE_4_86)
 	hook_function_with_cond_postcall(um_if_get_token_symbol,um_if_get_token,5);
 	hook_function_with_cond_postcall(update_mgr_read_eeprom_symbol,read_eeprom_by_offset,3);
 	#endif

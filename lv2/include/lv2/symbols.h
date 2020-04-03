@@ -3,7 +3,7 @@
 #ifndef __FIRMWARE_SYMBOLS_H_S__
 #define __FIRMWARE_SYMBOLS_H_S__
 
-#if defined(FIRMWARE_4_82) || defined(FIRMWARE_4_84)|| defined(FIRMWARE_4_85)
+#if defined(FIRMWARE_4_82) || defined(FIRMWARE_4_84)|| defined(FIRMWARE_4_85)|| defined(FIRMWARE_4_86)
 
 #define TOC 											0x34FBB0
 
@@ -271,6 +271,9 @@
 
 /* vars */
 #define thread_info_symbol								0x37DE30
+
+/* mmapper flags temp patch */
+#define mmapper_flags_temp_patch          0x70F78
 
 /* LV2 POKE */
 #define hash_checked_area                               0x352230
